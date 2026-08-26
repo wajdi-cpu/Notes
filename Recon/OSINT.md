@@ -30,3 +30,4 @@ photon -m http:example.com
 sherlock USERNAME
 ```
 
+- getting usernames https://github.com/initstring/linkedin2username
