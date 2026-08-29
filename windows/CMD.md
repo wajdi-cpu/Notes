@@ -1,32 +1,32 @@
 # Get the system info 
 
 ```js
-C:\htb> systeminfo
+systeminfo
 ```
 
 # list all the network interfaces 
 
 ```js
-C:\Users\htb\> ipconfig /all | more
+ipconfig /all | more
 ```
 
 
 # ARP to Find Additional Hosts
 
 ```js
-C:\htb> arp /a 
+arp /a 
 ```
 
 # to get the privs of the current user 
 
 ```js
-c:\htb> whoami /priv
+whoami /priv
 ```
 
 # Investigating Groups
 
 ```js
-C:\htb> whoami /groups
+whoami /groups
 ```
 
 # get all the informations 
@@ -38,28 +38,28 @@ whoami /all
 # display a list of all users on a host
 
 ```js
-C:\htb> net user 
+net user 
 ```
 
 # display a list of all groups on a host
 
 ```js
-C:\htb> net group net group 
+net group net group 
  
 ```
 
 ```js
-C:\htb>net localgroup 
+net localgroup 
 ```
 
 # Exploring Resources smb on the Network
 
 ```js
-C:\htb> net share
+net share
 ```
 
 ```js
-c:\htb> net view
+net view
 ```
 
 # Important Environment Variables 
@@ -76,23 +76,23 @@ c:\htb> net view
 # Query Services
 
 ```js
-C:\htb> tasklist /svc 
+tasklist /svc 
 ```
 
 # list all of the current running services
 
 ```js
-C:\htb> net start  
+net start  
 ```
 # Querry Scheduled Tasks
 
 ```js
-C:\htb> SCHTASKS /Query /V /FO list
+SCHTASKS /Query /V /FO list
 ```
 
 # New Task Creation
 
 ```js
-C:\htb> schtasks /create /sc ONSTART /tn "My Secret Task" /t
+schtasks /create /sc ONSTART /tn "My Secret Task" /t
 ```
 

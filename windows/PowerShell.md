@@ -25,30 +25,30 @@ Get-Command -verb get
 ## name filter 
 
 ```js
-PS C:\htb> Get-Command -noun windows*
+Get-Command -noun windows*
 ```
 
 # commands history 
 
 ```js
-PS C:\htb> Get-History
+Get-History
 ```
 
 # to view all history not just for the session :
 
 ```js
-PS C:\htb> get-content C:\Users\DLarusso\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+get-content C:\Users\DLarusso\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
 ```
 
 # getting local groups 
 
 ```js
-PS C:\htb> get-localgroup
+get-localgroup
 ```
 
 # getting local users 
 
 ```js
-PS C:\htb> Get-LocalUser
+Get-LocalUser
 ```
 
